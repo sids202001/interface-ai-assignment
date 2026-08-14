@@ -1,10 +1,14 @@
 # Computer-Use Automation System (Core Banking Integration)
 
-A reliable backend integration system designed to give AI agents "hands" inside legacy core banking applications that lack modern APIs. 
+A reliable backend integration system designed to give AI agents "hands" inside legacy core banking applications that lack modern APIs.
 
-The system operates in two decoupled phases:
-1. **Discovery Engine (LLM-driven)**: Explores target application UI flows, maps semantic elements, handles parameterization, and compiles a typed, versioned capability artifact.
-2. **Deterministic Replay Engine (Fast Robot)**: Replays the compiled artifact against the application without an LLM in the loop, enforcing safety policies, extracting structured outputs, and distinguishing legitimate business outcomes from runtime failures.
+### The Core Concept (In Layman's Terms)
+> **"Reason once with an AI scout, replay millions of times with a fast robot."**
+> 
+> Old bank back-office systems don't have APIs, forcing human tellers to manually click through multiple screens to do routine work. This system solves that:
+> 1. **Discovery (The AI Scout)**: An LLM explores the legacy banking UI, figures out what buttons to click and fields to fill, and writes down a structured, reusable blueprint (`artifact.json`).
+> 2. **Replay (The Fast Robot)**: In production, we don't use the slow/expensive AI. A fast, non-AI robot takes the blueprint, hydrates customer variables (like `member_id`), and runs the flow in under 2 seconds.
+> 3. **Smart Handling & Human Backup**: If a member doesn't exist, it calmly returns a structured `"Member Not Found"` business result instead of crashing. If an unexpected security popup appears, it pauses the live browser session, alerts a human operator to approve it, and resumes on that exact same screen.
 
 ---
 
