@@ -124,6 +124,21 @@ python3 src/main.py stability \
   --runs 5
 ```
 
+### 6. Agent-Facing Capability Interface & Catalog (Stretch Goal)
+Exposes the capability artifact as a standard function-calling tool schema compatible with OpenAI, Anthropic, or LiteLLM agents.
+
+```bash
+python3 src/main.py catalog --artifact artifact.json
+```
+
+### 7. Standalone Test Code Generation (Stretch Goal)
+Compiles the JSON artifact into a standalone, zero-dependency Playwright Python test script.
+
+```bash
+python3 src/main.py codegen --artifact artifact.json --output generated_test.py
+python3 generated_test.py "file://$(pwd)/demo_site/index.html"
+```
+
 ---
 
 ## Project Structure

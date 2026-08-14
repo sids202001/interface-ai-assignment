@@ -120,6 +120,15 @@ def main():
     escalate_parser.add_argument("--inputs", required=False, default='{"member_id": "12345"}', help="JSON string of inputs")
     escalate_parser.add_argument("--headed", action="store_true", help="Run browser in visible (headed) mode")
 
+    # 5. Catalog / Agent Interface Command (Stretch Goal)
+    catalog_parser = subparsers.add_parser("catalog", help="Expose artifact as callable AI Agent Function-Calling Tool")
+    catalog_parser.add_argument("--artifact", default="artifact.json", help="Path to capability artifact JSON")
+
+    # 6. Codegen Command (Stretch Goal)
+    codegen_parser = subparsers.add_parser("codegen", help="Emit runnable standalone Playwright test script from artifact")
+    codegen_parser.add_argument("--artifact", default="artifact.json", help="Path to capability artifact JSON")
+    codegen_parser.add_argument("--output", default="generated_test.py", help="Output Python script path")
+
     args = parser.parse_args()
 
     if args.command == "discover":
@@ -197,6 +206,21 @@ def main():
             inputs=inputs,
             headless=not args.headed
         )
+
+    elif args.command == "catalog":
+        from catalog import CapabilityCatalog
+        cat = CapabilityCatalog()
+        cat.register_artifact(args.artifact)
+        tools = cat.get_tool_definitions()
+        print("=" * 65)
+        print("🤖 [AGENT CAPABILITY CATALOG — FUNCTION CALLING SCHEMA]")
+        print("Exposing artifact as standard LLM tool definition for AI agents:")
+        print("=" * 65)
+        print(json.dumps(tools, indent=2))
+
+    elif args.command == "codegen":
+        from codegen import generate_playwright_script
+        generate_playwright_script(args.artifact, args.output)
 
 if __name__ == "__main__":
     main()
