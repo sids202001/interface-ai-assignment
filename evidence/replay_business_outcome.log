@@ -1,0 +1,17 @@
+
+[Replay Engine] Executing Capability: "open_savings_sub_account" (v1.0.0)
+[Replay Engine] Sanitized Inputs: {'member_id': '[REDACTED_PII]'}
+  Step 1: Fill #member-id with '12345'
+  Step 2: Click on #search-btn
+
+[Business Outcome Reached] Type: MEMBER_NOT_FOUND | Message: "Error: Member not found in core system." (Step 2)
+
+============================== REPLAY RESULT ==============================
+{
+  "status": "business_outcome",
+  "capability": "open_savings_sub_account",
+  "outcome_type": "MEMBER_NOT_FOUND",
+  "message": "Error: Member not found in core system.",
+  "step_index": 2
+}
+===========================================================================

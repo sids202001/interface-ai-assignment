@@ -1,0 +1,20 @@
+
+[Replay Engine] Executing Capability: "open_savings_sub_account" (v1.0.0)
+[Replay Engine] Sanitized Inputs: {'member_id': '[REDACTED_PII]'}
+  Step 1: Fill #member-id with '12345'
+  Step 2: Click on #search-btn
+
+[Hard Failure] Hard Failure on Step 2 (Click on #search-btn): Locator '#non-existent-button-xyz' timed out after 1000ms.
+  -> Evidence captured: Screenshot: evidence/failure_screenshot_1786661130.png, DOM: evidence/failure_dom_1786661130.html
+
+============================== REPLAY RESULT ==============================
+{
+  "status": "hard_failure",
+  "capability": "open_savings_sub_account",
+  "error": "Hard Failure on Step 2 (Click on #search-btn): Locator '#non-existent-button-xyz' timed out after 1000ms.",
+  "evidence": {
+    "screenshot": "evidence/failure_screenshot_1786661130.png",
+    "dom_dump": "evidence/failure_dom_1786661130.html"
+  }
+}
+===========================================================================

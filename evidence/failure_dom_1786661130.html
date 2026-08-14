@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Banking Back-Office Admin</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 24px; background: #f4f6f9; color: #1e293b; }
+        .hidden { display: none !important; }
+        .container { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; max-width: 540px; margin: 0 auto 20px auto; }
+        h1 { text-align: center; color: #0f172a; margin-bottom: 24px; font-size: 24px; }
+        h2 { font-size: 18px; margin-top: 0; color: #334155; }
+        button { padding: 10px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        button:hover { background: #1d4ed8; }
+        button.secondary { background: #64748b; margin-left: 8px; }
+        button.secondary:hover { background: #475569; }
+        button.danger { background: #dc2626; }
+        button.danger:hover { background: #b91c1c; }
+        input, select { padding: 10px; margin: 8px 0 16px 0; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #2563eb; ring: 2px solid #93c5fd; }
+        .error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; font-weight: 500; }
+        .success-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 14px; border-radius: 6px; margin-bottom: 16px; }
+        .interstitial-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 999; }
+        .modal { background: white; padding: 24px; border-radius: 8px; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .badge { display: inline-block; padding: 2px 8px; font-size: 12px; background: #e0e7ff; color: #3730a3; border-radius: 4px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <h1>Apex Core Banking • Servicing Terminal</h1>
+
+    <!-- Simulated Interstitial / Operator Intervention Dialog (Recoverable / Escalation trigger) -->
+    <div id="interstitial-modal" class="interstitial-overlay hidden">
+        <div class="modal">
+            <h2>⚠️ Security Verification Required</h2>
+            <p id="interstitial-msg">A supervisor or operator must verify identity or dismiss session advisory to continue.</p>
+            <div style="margin-top: 16px; text-align: right;">
+                <button id="dismiss-interstitial-btn">Acknowledge &amp; Dismiss</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Screen 1: Member Lookup -->
+    <div id="search-page" class="container">
+        <h2>Member Lookup</h2>
+        <div id="search-error" class="error hidden"></div>
+        <label for="member-id">Member Number / SSN Token:</label>
+        <input type="text" id="member-id" placeholder="Enter Member ID (e.g. 12345)" autocomplete="off" style="">
+        <button id="search-btn">Search Member</button>
+    </div>
+
+    <!-- Screen 2: Member Overview -->
+    <div id="detail-page" class="container hidden">
+        <h2>Member Record: <span id="detail-id" class="badge"></span></h2>
+        <p><strong>Full Name:</strong> <span id="detail-name">Jane Doe</span></p>
+        <p><strong>Primary Savings Balance:</strong> $<span id="detail-balance">5,000.00</span></p>
+        <p><strong>Relationship Tier:</strong> Premier Preferred</p>
+        <div style="margin-top: 20px;">
+            <button id="open-sub-btn">Open Sub-Account</button>
+            <button id="back-search-btn" class="secondary">Back to Search</button>
+        </div>
+    </div>
+
+    <!-- Screen 3: Sub-Account Opening Form -->
+    <div id="subaccount-page" class="container hidden">
+        <h2>Open Sub-Account for Member <span id="sub-member-id"></span></h2>
+        <div id="subaccount-error" class="error hidden"></div>
+        <label for="account-type">Product / Sub-Account Type:</label>
+        <select id="account-type">
+            <option value="">-- Select Product --</option>
+            <option value="checking">Premier Checking (0.10% APY)</option>
+            <option value="savings">High-Yield Savings (4.50% APY)</option>
+            <option value="money_market">Money Market Deposit (3.80% APY)</option>
+        </select>
+        
+        <label for="initial-deposit">Initial Deposit Amount ($):</label>
+        <input type="number" id="initial-deposit" value="100.00" min="0" step="0.01" style="">
+
+        <div style="margin-top: 20px;">
+            <button id="submit-sub-btn">Confirm &amp; Issue Account</button>
+            <button id="cancel-sub-btn" class="secondary">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Screen 4: Completion & Account Receipt -->
+    <div id="success-page" class="container hidden">
+        <div class="success-box">
+            <h2>Account Opened Successfully</h2>
+            <p>The new sub-account has been provisioned on the core banking ledger.</p>
+        </div>
+        <p><strong>New Sub-Account Number:</strong> <strong id="new-acct-id" style="font-family: monospace; font-size: 16px; color: #0284c7;">ACCT-74921</strong></p>
+        <p><strong>Status:</strong> <span id="acct-status">ACTIVE_OPEN</span></p>
+        <div style="margin-top: 24px;">
+            <button id="home-btn">Return to Servicing Home</button>
+        </div>
+    </div>
+
+    <script>
+        const membersDB = {
+            "12345": { name: "Jane Doe", balance: "5,000.00", active: true },
+            "99999": { name: "Robert Smith", balance: "14,820.50", active: true },
+            "55555": { name: "Frozen Account", balance: "0.00", active: false }
+        };
+        
+        let currentMember = null;
+
+        // Check if interstitial query param is passed (for recoverable condition / escalation test)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('interstitial') === '1') {
+            document.getElementById('interstitial-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('dismiss-interstitial-btn').addEventListener('click', () => {
+            document.getElementById('interstitial-modal').classList.add('hidden');
+        });
+
+        document.getElementById('search-btn').addEventListener('click', () => {
+            const idInput = document.getElementById('member-id');
+            const id = idInput.value.trim();
+            const err = document.getElementById('search-error');
+            
+            if (!id) {
+                err.innerText = "Error: Please enter a member ID.";
+                err.classList.remove('hidden');
+                return;
+            }
+
+            if (membersDB[id]) {
+                const member = membersDB[id];
+                if (!member.active) {
+                    err.innerText = "Business Outcome: Member account is flagged FROZEN / INACTIVE.";
+                    err.classList.remove('hidden');
+                    return;
+                }
+                currentMember = id;
+                err.classList.add('hidden');
+                document.getElementById('detail-id').innerText = id;
+                document.getElementById('detail-name').innerText = member.name;
+                document.getElementById('detail-balance').innerText = member.balance;
+                document.getElementById('search-page').classList.add('hidden');
+                document.getElementById('detail-page').classList.remove('hidden');
+            } else {
+                err.innerText = "Error: Member not found in core system.";
+                err.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('open-sub-btn').addEventListener('click', () => {
+            document.getElementById('detail-page').classList.add('hidden');
+            document.getElementById('sub-member-id').innerText = currentMember;
+            document.getElementById('subaccount-page').classList.remove('hidden');
+        });
+
+        document.getElementById('back-search-btn').addEventListener('click', () => {
+            document.getElementById('detail-page').classList.add('hidden');
+            document.getElementById('search-page').classList.remove('hidden');
+        });
+
+        document.getElementById('submit-sub-btn').addEventListener('click', () => {
+            const type = document.getElementById('account-type').value;
+            const err = document.getElementById('subaccount-error');
+            if (!type) {
+                err.innerText = "Validation Error: Please select an account product type.";
+                err.classList.remove('hidden');
+                return;
+            }
+            err.classList.add('hidden');
+            document.getElementById('subaccount-page').classList.add('hidden');
+            const generatedAcct = "ACCT-" + Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('new-acct-id').innerText = generatedAcct;
+            document.getElementById('success-page').classList.remove('hidden');
+        });
+
+        document.getElementById('cancel-sub-btn').addEventListener('click', () => {
+            document.getElementById('subaccount-page').classList.add('hidden');
+            document.getElementById('detail-page').classList.remove('hidden');
+        });
+
+        document.getElementById('home-btn').addEventListener('click', () => {
+            document.getElementById('success-page').classList.add('hidden');
+            document.getElementById('search-page').classList.remove('hidden');
+            document.getElementById('member-id').value = '';
+        });
+    </script>
+
+
+</body></html>

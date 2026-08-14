@@ -1,0 +1,26 @@
+
+[Replay Engine] Executing Capability: "open_savings_sub_account" (v1.0.0)
+[Replay Engine] Sanitized Inputs: {'member_id': '[REDACTED_PII]'}
+  Step 1: Fill #member-id with '12345'
+  Step 2: Click on #search-btn
+  Step 3: Click on #open-sub-btn
+  Step 4: Select #account-type with 'savings'
+  Step 5: Click on #submit-sub-btn
+  Step 6: Read on #new-acct-id
+    -> Extracted [new_account_id]: ACCT-48185
+  [Replay Engine] Verifying success checkpoint condition...
+[Replay Engine] Replay completed successfully.
+
+============================== REPLAY RESULT ==============================
+{
+  "status": "success",
+  "capability": "open_savings_sub_account",
+  "version": "1.0.0",
+  "outputs": {
+    "new_account_id": "ACCT-48185"
+  },
+  "sanitized_inputs": {
+    "member_id": "[REDACTED_PII]"
+  }
+}
+===========================================================================

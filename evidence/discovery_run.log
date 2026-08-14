@@ -1,0 +1,18 @@
+=================================================================
+🚀 [STARTING DISCOVERY ENGINE]
+Goal   : Open a high-yield savings sub-account for member 12345
+Target : file:///Users/siddheshsawant/interface-ai-assignment/demo_site/index.html
+=================================================================
+
+[Discovery Engine] Goal: "Open a high-yield savings sub-account for member 12345"
+[Discovery Engine] Target Surface: file:///Users/siddheshsawant/interface-ai-assignment/demo_site/index.html
+  Step 1: [FILL] member-id (Thought: Enter member identification number to look up profile)
+  Step 2: [CLICK] search-btn (Thought: Trigger search lookup query)
+  Step 3: [CLICK] open-sub-btn (Thought: Initiate sub-account creation workflow for retrieved member)
+  Step 4: [SELECT] account-type (Thought: Select High-Yield Savings product from dropdown)
+  Step 5: [CLICK] submit-sub-btn (Thought: Confirm opening and submit request to core banking ledger)
+  Step 6: [READ] new-acct-id (Thought: Read newly generated account ID from confirmation screen)
+  Step 7: [DONE]  (Thought: Successfully reached confirmation receipt screen)
+[Discovery Engine] Goal achieved. Compiling capability artifact...
+
+[Discovery Engine] Reusable capability artifact compiled and written to: evidence/artifact.json

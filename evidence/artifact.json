@@ -1,0 +1,180 @@
+{
+  "version": "1.0.0",
+  "name": "open_savings_sub_account",
+  "description": "Looks up a banking member and opens a new High-Yield Savings sub-account, returning the provisioned account ID.",
+  "category": "account_servicing",
+  "safety_policy": {
+    "allowed_domains": [
+      "*"
+    ],
+    "allowed_actions": [
+      "click",
+      "fill",
+      "select",
+      "read",
+      "navigate",
+      "wait"
+    ],
+    "requires_confirmation_on_risky": true,
+    "sensitive_fields": [
+      "member_id",
+      "ssn"
+    ]
+  },
+  "inputs": [
+    {
+      "name": "member_id",
+      "type": "string",
+      "description": "Input parameter for member-id",
+      "required": true,
+      "default": null,
+      "is_sensitive": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "new_account_id",
+      "type": "string",
+      "description": "Extracted text from #new-acct-id",
+      "extract_key": "new_account_id"
+    }
+  ],
+  "steps": [
+    {
+      "step_number": 1,
+      "step_type": "fill",
+      "target": {
+        "selector": "#member-id",
+        "strategy": "css",
+        "reasoning": "Unique input ID in core servicing portal",
+        "fallback_selectors": [
+          "[id='member-id']"
+        ]
+      },
+      "value": "{{member_id}}",
+      "extract_key": null,
+      "description": "Fill #member-id with '12345'",
+      "is_risky": false,
+      "timeout_ms": 5000
+    },
+    {
+      "step_number": 2,
+      "step_type": "click",
+      "target": {
+        "selector": "#search-btn",
+        "strategy": "css",
+        "reasoning": "Primary action button on search screen",
+        "fallback_selectors": [
+          "[id='search-btn']"
+        ]
+      },
+      "value": null,
+      "extract_key": null,
+      "description": "Click on #search-btn",
+      "is_risky": false,
+      "timeout_ms": 5000
+    },
+    {
+      "step_number": 3,
+      "step_type": "click",
+      "target": {
+        "selector": "#open-sub-btn",
+        "strategy": "css",
+        "reasoning": "Action button in member detail container",
+        "fallback_selectors": [
+          "[id='open-sub-btn']"
+        ]
+      },
+      "value": null,
+      "extract_key": null,
+      "description": "Click on #open-sub-btn",
+      "is_risky": false,
+      "timeout_ms": 5000
+    },
+    {
+      "step_number": 4,
+      "step_type": "select",
+      "target": {
+        "selector": "#account-type",
+        "strategy": "css",
+        "reasoning": "Product select control in opening form",
+        "fallback_selectors": [
+          "[id='account-type']"
+        ]
+      },
+      "value": "savings",
+      "extract_key": null,
+      "description": "Select #account-type with 'savings'",
+      "is_risky": false,
+      "timeout_ms": 5000
+    },
+    {
+      "step_number": 5,
+      "step_type": "click",
+      "target": {
+        "selector": "#submit-sub-btn",
+        "strategy": "css",
+        "reasoning": "Confirmation button on sub-account form",
+        "fallback_selectors": [
+          "[id='submit-sub-btn']"
+        ]
+      },
+      "value": null,
+      "extract_key": null,
+      "description": "Click on #submit-sub-btn",
+      "is_risky": true,
+      "timeout_ms": 5000
+    },
+    {
+      "step_number": 6,
+      "step_type": "read",
+      "target": {
+        "selector": "#new-acct-id",
+        "strategy": "css",
+        "reasoning": "Account confirmation badge element",
+        "fallback_selectors": [
+          "[id='new-acct-id']"
+        ]
+      },
+      "value": null,
+      "extract_key": "new_account_id",
+      "description": "Read on #new-acct-id",
+      "is_risky": true,
+      "timeout_ms": 5000
+    }
+  ],
+  "success_checkpoint": {
+    "condition_type": "element_visible",
+    "target": {
+      "selector": "#success-page",
+      "strategy": "css",
+      "reasoning": "Success confirmation container is displayed",
+      "fallback_selectors": []
+    },
+    "value": null,
+    "timeout_ms": 5000
+  },
+  "business_outcome_rules": [
+    {
+      "name": "Member Not Found",
+      "selector": "#search-error:not(.hidden)",
+      "pattern": null,
+      "outcome_type": "MEMBER_NOT_FOUND",
+      "description": "Member ID was not found in core database"
+    },
+    {
+      "name": "Account Frozen",
+      "selector": "#search-error:not(.hidden)",
+      "pattern": null,
+      "outcome_type": "ACCOUNT_FROZEN",
+      "description": "Member profile is inactive or flagged"
+    },
+    {
+      "name": "Validation Error",
+      "selector": "#subaccount-error:not(.hidden)",
+      "pattern": null,
+      "outcome_type": "VALIDATION_ERROR",
+      "description": "Form input validation rejected by application"
+    }
+  ]
+}

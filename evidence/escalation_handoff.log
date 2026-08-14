@@ -1,0 +1,32 @@
+=================================================================
+🧑‍💻 [DEMONSTRATING HUMAN-IN-THE-LOOP (HITL) ESCALATION]
+Scenario: Target page has an unexpected security verification modal.
+Automation will detect the blockage, pause on the LIVE CDP session,
+transfer control to the human operator, and resume execution seamlessly.
+=================================================================
+
+Step 1: Fill member-id with input parameter
+Step 2: Attempting to click #search-btn...
+  [Detection] Unexpected blocking modal detected! Raising intervention request...
+
+=================================================================
+🚨 [HUMAN-IN-THE-LOOP INTERVENTION TRIGGERED]
+Request ID   : INT-69424e7b
+Capability   : open_savings_sub_account
+Failed Step  : Step 2
+Reason       : Security verification overlay '#interstitial-modal' blocking interaction with '#search-btn'.
+Live URL     : file:///Users/siddheshsawant/interface-ai-assignment/demo_site/index.html?interstitial=1
+Snapshot     : evidence/escalation_2_1786661103.png
+Suggested    : Dismiss modal advisory or verify operator clearance.
+=================================================================
+[Operator Console] Auto-resolving intervention via policy: 'Operator dismissed security advisory.'
+[Operator Action] Dismissed blocking interstitial modal in live session.
+[Operator Console] Control handed back to automation engine (resolved).
+
+
+Step 2 (Resumed): Clicking #search-btn on the SAME live session...
+Step 3: Opening sub-account...
+Step 4: Selecting high-yield savings...
+Step 5: Submitting opening form...
+
+[Escalation Demo Result] Successfully completed flow! New Account ID: ACCT-50614
